@@ -3,8 +3,8 @@
 # should be treated as a package.
 
 import os
-
 from flask import Flask
+from . import db, auth
 
 def create_app(test_config=None):
     # create and configure the app
@@ -31,5 +31,9 @@ def create_app(test_config=None):
     @app.route('/hello/')
     def hello():
         return 'Hello man!'
+
+    db.init_app(app)
+
+    app.register_blueprint(auth.bp)
 
     return app
