@@ -95,3 +95,16 @@ def delete(id):
     db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
     return redirect(url_for('blog.index'))    
+
+# View each blog post individually in its own route
+@bp.route('/<int:id>', methods = ('GET',))
+def view_post(id):
+
+    post = get_db().execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE p.id = ?',
+        (id,)
+    ).fetchone()
+
+    return render_template('blog/blog_view.html', post=post)
