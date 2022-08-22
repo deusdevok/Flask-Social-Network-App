@@ -132,3 +132,17 @@ html {
     align-self: start;
     min-width: 10em;
   }
+
+
+  .like {
+    text-decoration: none;
+    color: transparent;  
+    text-shadow: 0 0 0 #000000;
+  }
+
+  .dislike {
+    text-decoration: none;
+    color: transparent;  
+    text-shadow: 0 0 0 #565656;
+    margin-left: 30px;
+  }

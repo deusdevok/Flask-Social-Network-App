@@ -13,5 +13,11 @@
             </div>
         </header>
         <p class="body">{{ post['body'] }}</p>
+        
+        <!-- LIKES/DISLIKES -->
+        <div class="likes">
+            <a class="like" href="{{ url_for('blog.like_post', id=post['id']) }}">👍 {{ post['likes_count'] }}</a>
+            <a class="dislike" href="{{ url_for('blog.like_post', id=post['id']) }}">👎 {{ post['username'] }}</a>
+        </div>
     </article>
 {% endblock %}

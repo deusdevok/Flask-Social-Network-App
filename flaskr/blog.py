@@ -35,9 +35,9 @@ def create():
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
+                'INSERT INTO post (title, body, author_id, likes_count, dislikes_count)'
+                ' VALUES (?, ?, ?, ?, ?)',
+                (title, body, g.user['id'], 'aaa', 'bbb')
             )
             db.commit()
             return redirect(url_for('blog.index'))
@@ -108,3 +108,16 @@ def view_post(id):
     ).fetchone()
 
     return render_template('blog/blog_view.html', post=post)
+
+# Like post
+@bp.route('/<int:id>', methods = ('GET',))
+@login_required
+def like_post(id):
+    db = get_db()
+    db.execute(
+        'UPDATE post SET likes_count = likes_count + 1'
+        ' WHERE id = ?',
+        (id,)
+    )
+    db.commit()
+    return redirect(url_for('blog.index'))
