@@ -13,7 +13,7 @@ CREATE TABLE post (
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     title TEXT NOT NULL,
     body TEXT NOT NULL,
-    likes_count TEXT NOT NULL,
-    dislikes_count INTEGER DEFAULT 0,
+    likes_count INT DEFAULT 0,
+    dislikes_count INT DEFAULT 0,
     FOREIGN KEY (author_id) REFERENCES user (id)
 );
