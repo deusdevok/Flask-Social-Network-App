@@ -47,6 +47,20 @@ def create():
                 ' VALUES (?, ?, ?, ?, ?)',
                 (title, body, g.user['id'], 0, 0)
             )
+                        
+            db.commit()
+
+            # Update likers table
+            post = get_db().execute(
+                'SELECT id FROM post',                
+            ).fetchone()
+
+            db.execute(
+                'INSERT INTO likers (user_id_, post_id, like_status)'
+                'VALUES (?, ?, ?)',
+                (g.user['id'], g.post['id'], 'none')
+            )
+
             db.commit()
             return redirect(url_for('blog.index'))
 
@@ -118,37 +132,40 @@ def view_post(id):
     return render_template('blog/blog_view.html', post=post)
 
 # Like post
-@bp.route('/<int:id>/', methods = ('GET',))
+@bp.route('/<int:id>/<likeOrDislike>/', methods = ('GET',))
 @login_required
 def like_post(id, likeOrDislike):
-    #id = d.id
-    #likeOrDislike = d.likeOrDislike
 
-    print('liking post...', likeOrDislike)
     db = get_db()
 
-    if likeOrDislike == 'like':
-        db.execute(
-            'UPDATE post SET likes_count = likes_count + 1'
+    liker = db.execute(
+        'SELECT user_id_, post_id, like_status'
+        'FROM likers'
+    )
+
+    print(liker)
+
+    db.execute(
+            'UPDATE post SET ' + likeOrDislike + 's_count' + ' = ' + likeOrDislike + 's_count' + ' + 1'
             ' WHERE id = ?',
             (id,)
         )
-    else:
-        db.execute(
-            'UPDATE post SET dislikes_count = dislikes_count + 1'
-            ' WHERE id = ?',
-            (id,)
-        )
+
+    db.execute(
+        'UPDATE likers SET like_status = ' + likeOrDislike
+    )
 
     db.commit()
 
+    '''
     post = get_db().execute(
         'SELECT p.id, title, body, created, author_id, username, likes_count, dislikes_count'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
+    '''
 
-    return render_template('blog/blog_view.html', post=post)
+    return redirect(url_for('blog.view_post', id=id))
 
  

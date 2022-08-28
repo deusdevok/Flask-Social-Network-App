@@ -16,7 +16,7 @@
         
         <!-- LIKES/DISLIKES -->
         <div class="likes">
-            <a class="like" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='like') }}">👍 {{ post['likes_count'] }}</a><br><br><br>
+            <a class="like" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='like') }}">👍 {{ post['likes_count'] }}</a>
             <a class="dislike" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='dislike') }}">👎 {{ post['dislikes_count'] }}</a>
         </div>
     </article>

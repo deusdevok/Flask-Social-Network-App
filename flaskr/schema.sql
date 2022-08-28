@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS post;
+DROP TABLE IF EXISTS likers;
 
 CREATE TABLE user (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,4 +17,13 @@ CREATE TABLE post (
     likes_count INT DEFAULT 0,
     dislikes_count INT DEFAULT 0,
     FOREIGN KEY (author_id) REFERENCES user (id)
+);
+
+CREATE TABLE likers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id_ INTEGER NOT NULL,
+    post_id INTEGER NOT NULL,
+    like_status TEXT DEFAULT NONE,
+    FOREIGN KEY (user_id_) REFERENCES user (id),
+    FOREIGN KEY (post_id) REFERENCES post (id)
 );
