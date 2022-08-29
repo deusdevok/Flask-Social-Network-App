@@ -46,20 +46,7 @@ def create():
                 'INSERT INTO post (title, body, author_id, likes_count, dislikes_count)'
                 ' VALUES (?, ?, ?, ?, ?)',
                 (title, body, g.user['id'], 0, 0)
-            )
-                        
-            db.commit()
-
-            # Update likers table
-            post = get_db().execute(
-                'SELECT id FROM post',                
-            ).fetchone()
-
-            db.execute(
-                'INSERT INTO likers (user_id_, post_id, like_status)'
-                'VALUES (?, ?, ?)',
-                (g.user['id'], g.post['id'], 'none')
-            )
+            )                        
 
             db.commit()
             return redirect(url_for('blog.index'))
@@ -137,34 +124,51 @@ def view_post(id):
 def like_post(id, likeOrDislike):
 
     db = get_db()
-
-    liker = db.execute(
-        'SELECT user_id_, post_id, like_status'
-        'FROM likers'
-    )
-
-    print(liker)
-
-    db.execute(
-            'UPDATE post SET ' + likeOrDislike + 's_count' + ' = ' + likeOrDislike + 's_count' + ' + 1'
-            ' WHERE id = ?',
-            (id,)
-        )
-
-    db.execute(
-        'UPDATE likers SET like_status = ' + likeOrDislike
-    )
-
-    db.commit()
-
-    '''
-    post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username, likes_count, dislikes_count'
+    
+    post = db.execute(
+        'SELECT p.id, title, body, created, author_id, username, likers, dislikers, likes_count, dislikes_count'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
-    '''
+    
+    likers, dislikers = post['likers'], post['dislikers']
+
+    # likers (and dislikers) is a string with user id's separated by commas
+    # Convert each one to a Python list
+    try:
+        likers = [int(n) for n in likers.split(',')]
+    except:
+        likers = []
+
+    try:    
+        dislikers = [int(n) for n in dislikers.split(',')]
+    except:
+        dislikers = []
+
+    if likeOrDislike == 'like':
+        if g.user['id'] not in likers:
+            likers.append(g.user['id'])
+    else:
+        if g.user['id'] not in dislikers:
+            dislikers.append(g.user['id'])
+
+    likes_count, dislikes_count = len(likers), len(dislikers)
+
+    likers = ','.join(str(n) for n in likers)
+    dislikers = ','.join(str(n) for n in dislikers)
+    
+    db.execute(
+            'UPDATE post SET '            
+            'likers = ?,'
+            'dislikers = ?,'
+            'likes_count = ?,'
+            'dislikes_count = ?'
+            ' WHERE id = ?',
+            (likers, dislikers, likes_count, dislikes_count, id,)
+        )
+
+    db.commit()
 
     return redirect(url_for('blog.view_post', id=id))
 
