@@ -16,8 +16,10 @@
         
         <!-- LIKES/DISLIKES -->
         <div class="likes">
-            <a class="like" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='like') }}">👍 {{ post['likes_count'] }}</a>
-            <a class="dislike" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='dislike') }}">👎 {{ post['dislikes_count'] }}</a>
+            {% set likeP = session['user_id']|string in post['likers'].split(',') %}
+            {% set dislikeP = session['user_id']|string in post['dislikers'].split(',') %}
+            <a class="like {% if likeP %} likeActive {% endif %}" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='like') }}">👍 {{ post['likes_count'] }}</a>
+            <a class="dislike {% if dislikeP %} likeActive {% endif %}" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='dislike') }}">👎 {{ post['dislikes_count'] }}</a>
         </div>
     </article>
 {% endblock %}

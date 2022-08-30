@@ -17,13 +17,6 @@ def index():
         ' ORDER BY created DESC'
     ).fetchall()
 
-    print('printing post data...')
-    for row in posts:
-        print(row['likes_count'], row['dislikes_count'])
-        print('\n')
-
-    print('I just printed some post data...')
-
     return render_template('blog/index.html', posts=posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
@@ -110,7 +103,7 @@ def delete(id):
 def view_post(id):
 
     post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username, likes_count, dislikes_count'
+        'SELECT p.id, title, body, created, author_id, username, likes_count, dislikes_count, likers, dislikers'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
@@ -146,12 +139,21 @@ def like_post(id, likeOrDislike):
     except:
         dislikers = []
 
-    if likeOrDislike == 'like':
+    if likeOrDislike == 'like': # Like
         if g.user['id'] not in likers:
             likers.append(g.user['id'])
-    else:
+        else:            
+            likers.pop(likers.index(g.user['id']))
+        if g.user['id'] in dislikers:
+            dislikers.pop(dislikers.index(g.user['id']))
+    else: # Dislike
         if g.user['id'] not in dislikers:
             dislikers.append(g.user['id'])
+        else:
+            dislikers.pop(dislikers.index(g.user['id']))
+        if g.user['id'] in likers:
+            likers.pop(likers.index(g.user['id']))
+
 
     likes_count, dislikes_count = len(likers), len(dislikers)
 
