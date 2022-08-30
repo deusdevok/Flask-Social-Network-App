@@ -12,7 +12,7 @@ bp = Blueprint('blog', __name__)
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, likes_count, dislikes_count'
+        'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
@@ -36,9 +36,9 @@ def create():
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id, likes_count, dislikes_count)'
-                ' VALUES (?, ?, ?, ?, ?)',
-                (title, body, g.user['id'], 0, 0)
+                'INSERT INTO post (title, body, author_id)'
+                ' VALUES (?, ?, ?)',
+                (title, body, g.user['id'])
             )                        
 
             db.commit()
@@ -48,7 +48,7 @@ def create():
 
 def get_post(id, check_author=True):
     post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username, likes_count, dislikes_count'
+        'SELECT p.id, title, body, created, author_id, username'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
@@ -103,7 +103,7 @@ def delete(id):
 def view_post(id):
 
     post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username, likes_count, dislikes_count, likers, dislikers'
+        'SELECT p.id, title, body, created, author_id, username, likers, dislikers'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
@@ -119,7 +119,7 @@ def like_post(id, likeOrDislike):
     db = get_db()
     
     post = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, likers, dislikers, likes_count, dislikes_count'
+        'SELECT p.id, title, body, created, author_id, username, likers, dislikers'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
@@ -154,20 +154,15 @@ def like_post(id, likeOrDislike):
         if g.user['id'] in likers:
             likers.pop(likers.index(g.user['id']))
 
-
-    likes_count, dislikes_count = len(likers), len(dislikers)
-
     likers = ','.join(str(n) for n in likers)
     dislikers = ','.join(str(n) for n in dislikers)
     
     db.execute(
             'UPDATE post SET '            
             'likers = ?,'
-            'dislikers = ?,'
-            'likes_count = ?,'
-            'dislikes_count = ?'
+            'dislikers = ?'
             ' WHERE id = ?',
-            (likers, dislikers, likes_count, dislikes_count, id,)
+            (likers, dislikers, id,)
         )
 
     db.commit()
