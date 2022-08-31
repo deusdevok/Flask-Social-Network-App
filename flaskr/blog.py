@@ -102,14 +102,22 @@ def delete(id):
 @bp.route('/<int:id>', methods = ('GET',))
 def view_post(id):
 
-    post = get_db().execute(
+    db = get_db()
+
+    post = db.execute(
         'SELECT p.id, title, body, created, author_id, username, likers, dislikers'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
 
-    return render_template('blog/blog_view.html', post=post)
+    comments = db.execute(
+        'SELECT * FROM comments'
+        ' WHERE post_id = ?',
+        (id,)
+    ).fetchall()
+
+    return render_template('blog/blog_view.html', post=post, comments=comments)
 
 # Like post
 @bp.route('/<int:id>/<likeOrDislike>/', methods = ('GET',))
@@ -170,3 +178,28 @@ def like_post(id, likeOrDislike):
     return redirect(url_for('blog.view_post', id=id))
 
  
+@bp.route('/<int:id>/comment', methods=('GET', 'POST'))
+@login_required
+def comment(id):
+    print('Commenting post...')
+    if request.method == 'POST':
+        comment = request.form['comment']
+        error = None
+
+        if not comment:
+            error = 'Comment is required.'
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'INSERT INTO comments (author_id, post_id, comment)'
+                ' VALUES (?, ?, ?)',
+                (g.user['id'], id, comment)
+            )                     
+
+            db.commit()
+            return redirect(url_for('blog.view_post', id=id))
+
+    return render_template('blog/create.html')

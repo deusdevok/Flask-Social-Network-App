@@ -28,5 +28,21 @@
             <a class="like {% if likeP %} likeActive {% endif %}" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='like') }}">👍 {{ likes_count }}</a>
             <a class="dislike {% if dislikeP %} likeActive {% endif %}" href="{{ url_for('blog.like_post', id=post['id'], likeOrDislike='dislike') }}">👎 {{ dislikes_count }}</a>
         </div>
+
+        <!-- COMMENTS -->
+        <div class="comment">
+            <form action="{{ url_for('blog.comment', id=post['id']) }}" method="post">
+                <label for="comment">Add a comment</label>
+                <textarea name="comment" id="comment">{{ request.form['comment'] }}</textarea>
+                <input type="submit" value="Comment">
+            </form>
+        </div>
+
+        {% for comment in comments %}
+            <div>
+                <h3>{{ comment[{{user[{{comment['author_id']}}]}}] }}</h3>
+                <p>{{ comment['comment'] }}</p>
+            </div>
+        {% endfor %}
     </article>
 {% endblock %}
