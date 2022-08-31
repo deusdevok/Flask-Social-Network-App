@@ -147,3 +147,13 @@ html {
   .likeActive {
     text-shadow: 0 0 0 #000000;
   }
+
+  .comment {
+    background: #d3d3d3;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .comment-text {
+    margin-top: 30px;
+  }

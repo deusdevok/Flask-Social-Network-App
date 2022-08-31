@@ -194,9 +194,9 @@ def comment(id):
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO comments (author_id, post_id, comment)'
-                ' VALUES (?, ?, ?)',
-                (g.user['id'], id, comment)
+                'INSERT INTO comments (author_id, author_username, post_id, comment)'
+                ' VALUES (?, ?, ?, ?)',
+                (g.user['id'], g.user['username'], id, comment)
             )                     
 
             db.commit()

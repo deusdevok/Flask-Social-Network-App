@@ -30,18 +30,19 @@
         </div>
 
         <!-- COMMENTS -->
-        <div class="comment">
+        <div class="comment-form">
             <form action="{{ url_for('blog.comment', id=post['id']) }}" method="post">
                 <label for="comment">Add a comment</label>
-                <textarea name="comment" id="comment">{{ request.form['comment'] }}</textarea>
+                <textarea name="comment" id="comment" placeholder="Comment...">{{ request.form['comment'] }}</textarea>
                 <input type="submit" value="Comment">
             </form>
         </div>
 
         {% for comment in comments %}
-            <div>
-                <h3>{{ comment[{{user[{{comment['author_id']}}]}}] }}</h3>
-                <p>{{ comment['comment'] }}</p>
+            <div class="comment">
+                <p>{{ comment['author_username'] }} says:</p>
+                <h4>{{ comment['created'] }}</h4>
+                <p class="comment-text">{{ comment['comment'] }}</p>
             </div>
         {% endfor %}
     </article>
