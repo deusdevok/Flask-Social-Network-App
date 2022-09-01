@@ -91,3 +91,18 @@ def test_delete(client, auth, app):
         db = get_db()
         post = db.execute('SELECT * FROM post WHERE id = 1').fetchone()
         assert post is None    
+
+def test_view_post(client):     
+    assert client.get('/1').status_code == 200 
+
+'''
+def test_like(client, auth, app):
+    auth.login()
+    response = client.post('/1/like/')
+    assert response.headers['Location'] == '/1/'
+
+    with app.app_context():
+        db = get_db()
+        likers = db.execute('SELECT likers FROM post WHERE id = 1').fetchone()
+        assert '1' in likers.split(',')
+'''        
