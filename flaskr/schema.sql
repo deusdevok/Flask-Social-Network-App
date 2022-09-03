@@ -16,6 +16,7 @@ CREATE TABLE post (
     body TEXT NOT NULL,
     likers TEXT DEFAULT '',
     dislikers TEXT DEFAULT '',
+    tags TEXT DEFAULT '',
     FOREIGN KEY (author_id) REFERENCES user (id)
 );
 

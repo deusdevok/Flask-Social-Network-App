@@ -12,20 +12,27 @@ bp = Blueprint('blog', __name__)
 def index():
     db = get_db()
     posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'
+        'SELECT p.id, title, body, created, author_id, username, tags'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
 
-    return render_template('blog/index.html', posts=posts)
+    all_tags = []
+    for post in posts:
+        all_tags += post['tags'].split(',')
+
+    all_tags = list(set(all_tags))
+
+    return render_template('blog/index.html', posts=posts, all_tags = all_tags)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
-    print('Creating post...')
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
+        tags = request.form['tags']
+
         error = None
 
         if not title:
@@ -36,9 +43,9 @@ def create():
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
+                'INSERT INTO post (title, body, author_id, tags)'
+                ' VALUES (?, ?, ?, ?)',
+                (title, body, g.user['id'], tags)
             )                        
 
             db.commit()
@@ -48,7 +55,7 @@ def create():
 
 def get_post(id, check_author=True):
     post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
+        'SELECT p.id, title, body, created, author_id, username, tags'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
@@ -105,7 +112,7 @@ def view_post(id):
     db = get_db()
 
     post = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, likers, dislikers'
+        'SELECT p.id, title, body, created, author_id, username, likers, dislikers, tags'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
@@ -113,7 +120,8 @@ def view_post(id):
 
     comments = db.execute(
         'SELECT * FROM comments'
-        ' WHERE post_id = ?',
+        ' WHERE post_id = ?'
+        ' ORDER BY created DESC',
         (id,)
     ).fetchall()
 
