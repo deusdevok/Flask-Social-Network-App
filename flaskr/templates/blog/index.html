@@ -9,12 +9,21 @@
 
 {% block content %}  
 
+  <!-- SEARCH BOX -->
+  <form method="post" action="{{ url_for('blog.search_post') }}">
+    <label for="search"></label>
+    <input id="search" name="search" placeholder="Enter title search ..." value="{{ request.form['search'] }}">
+    <input type="submit" value="Search">
+  </form>
+
   <!-- ALL TAGS -->
   <br>
   <span>All tags:</span>
-  {% for item in all_tags %}
-  <a href="{{ url_for('blog.viewtag', tag=item) }}"><span class="tags">{{ item }}</span></a>
+  {% for item in all_tags if item %}
+    <a href="{{ url_for('blog.viewtag', tag=item) }}"><span class="tags">{{ item }}</span></a>
   {% endfor %} 
+
+  <p>Watching {{ 'all tags' if not current_tag else current_tag + ' tag' }}</p>
 
   {% for post in posts %}
     <article class="post">
@@ -30,8 +39,8 @@
       </header>
 
       <!-- TAGS -->
-      {% for item in post['tags'].split(',') %}
-        <span class="tags">{{ item }}</span>
+      {% for item in post['tags'].split(',') if item %}
+        <span class="tags">{{ item }}</span>  
       {% endfor %}
 
       <p class="body">{{ post['body'] }}</p>

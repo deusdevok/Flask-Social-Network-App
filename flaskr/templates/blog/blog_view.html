@@ -14,8 +14,8 @@
         </header>
 
         <!-- TAGS -->
-        {% for item in post['tags'].split(',') %}
-            <span class="tags">{{ item }}</span>
+        {% for item in post['tags'].split(',') if item %}
+            <a href="{{ url_for('blog.viewtag', tag=item) }}"><span class="tags">{{ item }}</span></a>
         {% endfor %}
 
         <p class="body">{{ post['body'] }}</p>

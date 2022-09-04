@@ -50,7 +50,25 @@ def viewtag(tag):
         {'tag': '%' + tag + '%'}
     ).fetchall()
 
-    return render_template('blog/index.html', posts=posts, all_tags = all_tags)
+    return render_template('blog/index.html', posts=posts, all_tags = all_tags, current_tag=tag)
+
+@bp.route('/search', methods=('GET','POST'))    
+def search_post():
+    if request.method == 'POST':
+        search = request.form['search']
+        
+        db = get_db()
+
+        # Select posts with search query
+        posts = db.execute(
+            'SELECT p.id, title, body, created, author_id, username, tags'
+            ' FROM post p JOIN user u ON p.author_id = u.id'
+            ' WHERE title LIKE :search'
+            ' ORDER BY created DESC',
+            {'search': '%' + search + '%'}
+        ).fetchall()
+
+    return render_template('blog/index.html', posts=posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
