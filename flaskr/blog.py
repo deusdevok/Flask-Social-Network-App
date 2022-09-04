@@ -25,6 +25,33 @@ def index():
 
     return render_template('blog/index.html', posts=posts, all_tags = all_tags)
 
+@bp.route('/tag/<tag>')
+def viewtag(tag):
+    db = get_db()
+
+    posts = db.execute(
+        'SELECT p.id, title, body, created, author_id, username, tags'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' ORDER BY created DESC'
+    ).fetchall()
+
+    all_tags = []
+    for post in posts:
+        all_tags += post['tags'].split(',')
+
+    all_tags = list(set(all_tags))
+
+    # Select posts with specific tag    
+    posts = db.execute(
+        'SELECT p.id, title, body, created, author_id, username, tags'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE tags LIKE :tag'
+        ' ORDER BY created DESC',
+        {'tag': '%' + tag + '%'}
+    ).fetchall()
+
+    return render_template('blog/index.html', posts=posts, all_tags = all_tags)
+
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():

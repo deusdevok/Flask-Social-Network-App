@@ -8,10 +8,13 @@
 {% endblock %}
 
 {% block content %}  
+
   <!-- ALL TAGS -->
+  <br>
+  <span>All tags:</span>
   {% for item in all_tags %}
-    <span class="tags">{{ item }}</span>
-  {% endfor %}
+  <a href="{{ url_for('blog.viewtag', tag=item) }}"><span class="tags">{{ item }}</span></a>
+  {% endfor %} 
 
   {% for post in posts %}
     <article class="post">
