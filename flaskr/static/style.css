@@ -175,3 +175,9 @@ html {
   .tags:active {
     background: #2a4d74;
   }
+
+  .pages {
+    background: #405586;
+    color: #fff;
+    padding: 3px;
+  }
