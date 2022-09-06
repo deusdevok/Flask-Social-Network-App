@@ -6,16 +6,39 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
-bp = Blueprint('blog', __name__)
+def get_post(id, check_author=True):
+    post = get_db().execute(
+        'SELECT p.id, title, body, created, author_id, username, tags, likers, dislikers, tags'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' WHERE p.id = ?',
+        (id,)
+    ).fetchone()
 
-@bp.route('/')
-def index():
-    db = get_db()
-    posts = db.execute(
+    if post is None:
+        abort(404, f"Post id {id} doesn't exist.")
+
+    if check_author and post['author_id'] != g.user['id']:
+        abort(403)
+
+    return post   
+
+def get_all_posts():
+    posts = get_db().execute(
         'SELECT p.id, title, body, created, author_id, username, tags'
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
+
+    return posts
+
+bp = Blueprint('blog', __name__)
+
+@bp.route('/')
+def index():
+    
+    db = get_db()
+
+    posts = get_all_posts()
 
     total_posts = len(posts)
 
@@ -40,11 +63,7 @@ def index_by_page(page_index):
     page_index = int(page_index)
     db = get_db()
 
-    posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, tags'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
-    ).fetchall()
+    posts = get_all_posts()
 
     total_posts = len(posts)
 
@@ -61,7 +80,6 @@ def index_by_page(page_index):
         ' LIMIT ? OFFSET ?',
         (5, 5*page_index-5)
     ).fetchall()
-    
 
     return render_template('blog/index.html', posts=posts, all_tags = all_tags, total_posts=total_posts, page_index = page_index)
 
@@ -69,11 +87,9 @@ def index_by_page(page_index):
 def viewtag(tag):
     db = get_db()
 
-    posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, tags'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
-    ).fetchall()
+    posts = get_all_posts()
+
+    total_posts = len(posts)
 
     all_tags = []
     for post in posts:
@@ -90,7 +106,7 @@ def viewtag(tag):
         {'tag': '%' + tag + '%'}
     ).fetchall()
 
-    return render_template('blog/index.html', posts=posts, all_tags = all_tags, current_tag=tag)
+    return render_template('blog/index.html', posts=posts, all_tags = all_tags, current_tag=tag, total_posts=total_posts)
 
 @bp.route('/search', methods=('GET','POST'))    
 def search_post():
@@ -108,7 +124,9 @@ def search_post():
             {'search': '%' + search + '%'}
         ).fetchall()
 
-    return render_template('blog/index.html', posts=posts)
+        total_posts = len(posts)
+
+    return render_template('blog/index.html', posts=posts, total_posts=total_posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -137,22 +155,6 @@ def create():
             return redirect(url_for('blog.index'))
 
     return render_template('blog/create.html')    
-
-def get_post(id, check_author=True):
-    post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username, tags'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
-
-    if post is None:
-        abort(404, f"Post id {id} doesn't exist.")
-
-    if check_author and post['author_id'] != g.user['id']:
-        abort(403)
-
-    return post    
 
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
 @login_required
@@ -196,12 +198,7 @@ def view_post(id):
 
     db = get_db()
 
-    post = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, likers, dislikers, tags'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
+    post = get_post(id, check_author=False)
 
     comments = db.execute(
         'SELECT * FROM comments'
@@ -218,13 +215,7 @@ def view_post(id):
 def like_post(id, likeOrDislike):
 
     db = get_db()
-    
-    post = db.execute(
-        'SELECT p.id, title, body, created, author_id, username, likers, dislikers'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
+    post = get_post(id)
     
     likers, dislikers = post['likers'], post['dislikers']
 
