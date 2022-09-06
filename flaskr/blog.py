@@ -17,18 +17,43 @@ def index():
         ' ORDER BY created DESC'
     ).fetchall()
 
+    total_posts = len(posts)
+
+    all_tags = []
+    for post in posts:
+        all_tags += post['tags'].split(',')
+
+    all_tags = list(set(all_tags))  
+
+    posts = db.execute(
+        'SELECT p.id, title, body, created, author_id, username, tags'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' ORDER BY created DESC'
+        ' LIMIT ?',
+        (5,)
+    ).fetchall()
+
+    return render_template('blog/index.html', posts=posts, all_tags = all_tags, total_posts=total_posts, page_index = 1)
+
+@bp.route('/page/<page_index>')
+def index_by_page(page_index):
+    page_index = int(page_index)
+    db = get_db()
+
+    posts = db.execute(
+        'SELECT p.id, title, body, created, author_id, username, tags'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' ORDER BY created DESC'
+    ).fetchall()
+
+    total_posts = len(posts)
+
     all_tags = []
     for post in posts:
         all_tags += post['tags'].split(',')
 
     all_tags = list(set(all_tags))
 
-    return render_template('blog/index.html', posts=posts, all_tags = all_tags)
-
-@bp.route('/page/<page_index>')
-def index_by_page(page_index):
-    page_index = int(page_index)
-    db = get_db()
     posts = db.execute(
         'SELECT p.id, title, body, created, author_id, username, tags'
         ' FROM post p JOIN user u ON p.author_id = u.id'
@@ -38,13 +63,7 @@ def index_by_page(page_index):
     ).fetchall()
     
 
-    all_tags = []
-    for post in posts:
-        all_tags += post['tags'].split(',')
-
-    all_tags = list(set(all_tags))
-
-    return render_template('blog/index.html', posts=posts, all_tags = all_tags)
+    return render_template('blog/index.html', posts=posts, all_tags = all_tags, total_posts=total_posts, page_index = page_index)
 
 @bp.route('/tag/<tag>')
 def viewtag(tag):

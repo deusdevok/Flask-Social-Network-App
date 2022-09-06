@@ -176,8 +176,30 @@ html {
     background: #2a4d74;
   }
 
-  .pages {
-    background: #405586;
+  .pagination_container {
+    font-size: 0;
+    margin-top: 30px;
+  }
+
+  .pagination_button {
+    border: 1px solid #c4c4c4;
+    background: #ffffff;
+    color: #1723d4;
+    font-size: 18px;
+    padding: 10px 16px;
+    margin: 0;
+    text-decoration: none;
+  }
+
+  .pagination_button:hover {
+    background: #939bff;
+  }
+
+  .pagination_button_active {
+    background: #2634f1;
     color: #fff;
-    padding: 3px;
+  }
+
+  .pagination_button_active:hover {
+    background: #2634f1;
   }
