@@ -16,7 +16,9 @@
         <!-- TAGS -->
         {% for item in post['tags'].split(',') if item %}
             <a href="{{ url_for('blog.viewtag', tag=item) }}"><span class="tags">{{ item }}</span></a>
-        {% endfor %}
+        {% endfor %} <br>
+
+        <img class="post-img" src="{{ url_for('static', filename='images/' + post['img_path']) }}" alt="">
 
         <p class="body">{{ post['body'] }}</p>
         

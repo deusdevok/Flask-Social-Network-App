@@ -203,3 +203,7 @@ html {
   .pagination_button_active:hover {
     background: #2634f1;
   }
+
+  .post-img {
+    max-width: 100%;
+  }
