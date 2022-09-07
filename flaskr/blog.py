@@ -42,11 +42,14 @@ def allowed_file(filename):
 
 bp = Blueprint('blog', __name__)
 
+@bp.route('/feed')
+def rss():
+    posts = get_all_posts()
+    return render_template('rssfeed/rssfeed.rss', posts=posts)
+
 @bp.route('/')
 def index():
-    
     db = get_db()
-
     posts = get_all_posts()
 
     total_posts = len(posts)

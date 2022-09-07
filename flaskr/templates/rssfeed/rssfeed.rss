@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+    <title>Flaskr Blog</title>
+    <link>/</link>
+    <description>A blog written in Flask</description>
+    <image>
+        <url>https://flask.palletsprojects.com/en/2.2.x/_images/flask-logo.png</url>
+        <link>https://flask.palletsprojects.com/en/2.2.x/</link>
+    </image>
+
+    {% for post in posts %}
+        <item>
+            <title>{{ post['title'] }}</title>
+            <link>{{ post['id'] }}</link>
+            <description>New post</description>
+        </item>
+    {% endfor %}
+
+</channel>
+
+</rss>
