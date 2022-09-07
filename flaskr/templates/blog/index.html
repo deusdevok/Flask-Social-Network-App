@@ -57,7 +57,11 @@
         <span class="tags">{{ item }}</span>  
       {% endfor %}
 
-      <p class="body">{{ post['body'] }}</p>
+      <div class="body">
+        {% filter markdown %}
+          {{ post['body'] }}
+        {% endfilter %}
+      </div>
     </article>
     {% if not loop.last %}
       <hr>

@@ -42,8 +42,6 @@ def allowed_file(filename):
 
 bp = Blueprint('blog', __name__)
 
-
-
 @bp.route('/')
 def index():
     
@@ -141,7 +139,7 @@ def search_post():
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
-def create():    
+def create():
 
     if request.method == 'POST':
         title = request.form['title']
@@ -165,9 +163,6 @@ def create():
             file.save(img_path)
         else:
             filename = ''
-
-        
-
 
         if error is not None:
             flash(error)
@@ -223,11 +218,8 @@ def delete(id):
 # View each blog post individually in its own route
 @bp.route('/<int:id>', methods = ('GET',))
 def view_post(id):
-
     db = get_db()
-
     post = get_post(id, check_author=False)
-    print(post['img_path'])
     comments = db.execute(
         'SELECT * FROM comments'
         ' WHERE post_id = ?'

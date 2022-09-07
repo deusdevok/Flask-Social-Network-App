@@ -20,7 +20,11 @@
 
         <img class="post-img" src="{{ url_for('static', filename='images/' + post['img_path']) }}" alt="">
 
-        <p class="body">{{ post['body'] }}</p>
+        <div class="body">
+            {% filter markdown %}
+                {{ post['body'] }}
+            {% endfilter %}
+        </div>
         
         <!-- LIKES/DISLIKES -->
         <div class="likes">
