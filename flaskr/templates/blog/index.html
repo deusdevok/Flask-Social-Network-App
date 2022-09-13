@@ -12,20 +12,33 @@
 {% block content %}  
 
   <!-- SEARCH BOX -->
-  <form method="post" action="{{ url_for('blog.search_post') }}">
-    <label for="search"></label>
-    <input id="search" name="search" placeholder="Enter title search ..." value="{{ request.form['search'] }}">
-    <input type="submit" value="Search">
-  </form>
+  {% if  posts %}
+    <form method="post" action="{{ url_for('blog.search_post') }}">
+      <label for="search"></label>
+      <input id="search" name="search" placeholder="Enter title search ..." value="{{ request.form['search'] }}">
+      <input type="submit" value="Search">
+    </form>
+  {% else %}
+    <p>There are no posts yet</p>
+    {% if g.user %}
+      <p>Create a <a class="action" href="{{ url_for('blog.create') }}">New Post</a>!</p>
+    {% else %}
+      <p>Either <a href="{{ url_for('auth.login') }}">Log In</a> or <a href="{{ url_for('auth.register') }}">Register</a> to create a new post</p>
+    {% endif %}
+  {% endif %}
 
   <!-- ALL TAGS -->
   <br>
-  <span>All tags:</span>
+  <span>{{ 'All tags:' if all_tags else '' }}</span>
   {% for item in all_tags if item %}
     <a href="{{ url_for('blog.viewtag', tag=item) }}"><span class="tags">{{ item }}</span></a>
   {% endfor %} 
 
-  <p>Watching {{ 'all tags' if not current_tag else current_tag + ' tag' }}</p>
+  {% if all_tags %}
+    <p>Watching {{ 'all tags' if not current_tag else current_tag + ' tag' }}</p>
+  {% else %}
+    <p></p>
+  {% endif %}
 
   <!-- PAGINATION -->
   {% set n = total_posts // 5 %}
@@ -61,7 +74,7 @@
 
       <div class="body">
         {% filter markdown %}
-          {{ post['body'] }}
+          {{ '\n'+post['body'] }}
         {% endfilter %}
       </div>
     </article>

@@ -22,7 +22,7 @@
 
         <div class="body">
             {% filter markdown %}
-                {{ post['body'] }}
+                {{ '\n'+post['body'] }}
             {% endfilter %}
         </div>
         
