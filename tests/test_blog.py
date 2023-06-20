@@ -53,7 +53,7 @@ def test_exists_required(client, auth, path):
 def test_create(client, auth, app):
     auth.login()
     assert client.get('/create').status_code == 200
-    client.post('/create', data={'title': 'created', 'body': ''})
+    client.post('/create', data={'title': 'created', 'body': '', 'tags': '', 'filename': ''})
 
     with app.app_context():
         db = get_db()
@@ -78,8 +78,9 @@ def test_update(client, auth, app):
 ))
 def test_create_update_validate(client, auth, path):
     auth.login()
-    response = client.post(path, data={'title': '', 'body': ''})
-    assert b'Title is required.' in response.data      
+    response = client.post(path, data={'title': 'asd', 'body': ''})
+    print('RESPONSE:', response.data)
+    assert b'Title is required.' in response.data
 
 
 def test_delete(client, auth, app):

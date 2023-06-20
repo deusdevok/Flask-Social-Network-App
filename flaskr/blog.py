@@ -161,7 +161,7 @@ def create():
             
             img_path = url_for('static', filename='images/'+filename)
             img_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static\images\\' + filename)
-            print(img_path)
+            #print(img_path)
             
             file.save(img_path)
         else:
