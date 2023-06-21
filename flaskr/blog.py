@@ -143,7 +143,6 @@ def search_post():
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
-
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
@@ -155,8 +154,10 @@ def create():
             error = 'Title is required.'
 
         # FILE UPLOAD
-        file = request.files['file']
-        if file and allowed_file(file.filename):            
+        #file = request.files['file']
+
+        try: # request.files['file'] and allowed_file(request.files['file'].filename): 
+            file = request.files['file']           
             filename = secure_filename(file.filename) # Name of the file
             
             img_path = url_for('static', filename='images/'+filename)
@@ -164,7 +165,8 @@ def create():
             #print(img_path)
             
             file.save(img_path)
-        else:
+        #else:
+        except:
             filename = ''
 
         if error is not None:

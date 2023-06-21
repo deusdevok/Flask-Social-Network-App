@@ -1,6 +1,5 @@
 import pytest
 from flaskr.db import get_db
-import json
 
 def test_index(client, auth):
     response = client.get('/')
@@ -53,15 +52,11 @@ def test_exists_required(client, auth, path):
 def test_create(client, auth, app):
     auth.login()
     assert client.get('/create').status_code == 200
-    headers = {
-        "Content-Type": "multipart/form-data",
-    }
-    r = client.post('/create', data={"title": "created", "body": "the body", "tags": "", "author_id": 1}, headers=headers)
-    print('R create', r.headers)
+    
+    client.post('/create', data={"title": "created", "body": "the body", "tags": ""})
 
     with app.app_context():
         db = get_db()
-        print('DB', db.execute('SELECT * FROM post').fetchall())
         count = db.execute('SELECT COUNT(id) FROM post').fetchone()[0]
         assert count == 2
 
@@ -70,7 +65,6 @@ def test_update(client, auth, app):
     auth.login()
     assert client.get('/1/update').status_code == 200
     r = client.post('/1/update', data={'title': 'updated', 'body': ''})
-    print('R update', r)
 
     with app.app_context():
         db = get_db()
@@ -84,8 +78,7 @@ def test_update(client, auth, app):
 ))
 def test_create_update_validate(client, auth, path):
     auth.login()
-    response = client.post(path, data={'title': 'asd', 'body': ''})
-    print('RESPONSE:', response.data)
+    response = client.post(path, data={"title": "", "body": "the body", "tags": ""})
     assert b'Title is required.' in response.data
 
 
